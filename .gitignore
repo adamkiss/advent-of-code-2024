@@ -1,5 +1,9 @@
 # Production files
 # ------------
+site/commands/inputs
+
+# Production files
+# ------------
 /public/assets/dev
 /public/assets/dist
 /site/snippets/_assets.php
