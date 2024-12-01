@@ -1,0 +1,49 @@
+# Production files
+# ------------
+/public/assets/dev
+/public/assets/dist
+/site/snippets/_assets.php
+/public/janitor-*
+
+# Libs
+# ------------
+vendor
+!public/assets/vendor
+node_modules
+
+# Plugins
+# ------------
+site/plugins/layouts
+
+# System files
+# ------------
+Icon
+.DS_Store
+
+# Temporary files
+# ---------------
+/public/media/*
+!/public/media/index.html
+
+# Lock files
+# ---------------
+.lock
+
+# Editors
+# ---------------
+# /.vscode
+*.sublime-project
+*.sublime-workspace
+/.idea
+
+# Storage
+# ---------------
+/storage/accounts/*
+/storage/cache/*
+/storage/logs/*
+/storage/sessions/*
+!/storage/**/.gitkeep
+
+# License
+# ---------------
+/site/config/.license
