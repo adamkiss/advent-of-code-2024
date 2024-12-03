@@ -3,6 +3,8 @@
 use Kirby\Toolkit\A;
 use Kirby\Toolkit\Str;
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 function part1 (array $input): int {
 	$count = A::reduce(
 		$input,
@@ -74,28 +76,20 @@ function part2 (array $input) {
 	return $count;
 }
 
-return [
-	'description' => 'Advent of Code: Day 00',
-	'args' => [],
-	'command' => static function ($cli): void {
-		$input = @require_once(__DIR__ . '/../inputs/' . basename(__FILE__));
-		$demoinput = Str::split(<<<INPUT
-		7 6 4 2 1
-		1 2 7 8 9
-		9 7 6 2 1
-		1 3 2 4 5
-		8 6 4 4 1
-		1 3 6 7 9
-		INPUT, "\n");
+$input = @require_once(__DIR__ . '/inputs/' . basename(__FILE__));
+$demoinput = Str::split(<<<INPUT
+7 6 4 2 1
+1 2 7 8 9
+9 7 6 2 1
+1 3 2 4 5
+8 6 4 4 1
+1 3 6 7 9
+INPUT, "\n");
 
-		// PART 1
-		$cli->out('1) Result of demo: ' . part1($demoinput));
-		$cli->out('1) Result of real input: ' . part1($input));
-		$cli->out('–––');
-		// PART 2
-		$cli->out('2) Result of demo: ' . part2($demoinput));
-		$cli->out('2) Result of real input: ' . part2($input));
-
-		$cli->success('Ran both tasks!');
-	}
-];
+// PART 1
+println('1) Result of demo: ' . part1($demoinput));
+println('1) Result of real input: ' . part1($input));
+println('–––');
+// PART 2
+println('2) Result of demo: ' . part2($demoinput));
+println('2) Result of real input: ' . part2($input));

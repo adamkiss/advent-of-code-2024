@@ -1,6 +1,0 @@
-Title: Home
-
-----
-
-Text:
-Welcome to aoc24.adamkiss.com. Have fun creating it.

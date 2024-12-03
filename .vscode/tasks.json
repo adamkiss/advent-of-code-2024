@@ -6,7 +6,7 @@
         {
             "label": "Run kirby-cli command 'run'",
             "type": "shell",
-            "command": "k run-code",
+            "command": "php run-last.php",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
