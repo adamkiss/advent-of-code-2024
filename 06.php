@@ -30,7 +30,7 @@ function turnRight(array $direction = []) {
 	};
 }
 
-function part1 (string $input) {
+function part1 (string $input): array {
 	$map = toMap($input);
 	$pos = null;
 	$vec = null;
@@ -64,7 +64,7 @@ function part1 (string $input) {
 		}
 	} while (true);
 
-	$X = A::reduce(
+	$count = A::reduce(
 		$map,
 		fn($total, $it) => $total + A::reduce(
 			$it,
@@ -74,7 +74,7 @@ function part1 (string $input) {
 		0
 	);
 
-	return $X;
+	return [$count, $map];
 }
 
 function isMapTraversalLooped(array $map, array $pos, array $vec) : bool {
@@ -146,10 +146,11 @@ function part2 (string $input) {
 		}
 	}
 
+	$solved = part1($input)[1];
 	$looped = 0;
-	foreach ($map as $y => $line) {
+	foreach ($solved as $y => $line) {
 		foreach ($line as $x => $symbol) {
-			if ($symbol === '.') {
+			if ($symbol === 'X') {
 				$testMap = $map;
 				$testMap[$y][$x] = 'O';
 				if (isMapTraversalLooped($testMap, $pos, $vec)) {
@@ -177,8 +178,8 @@ $demoinput = <<<INPUT
 INPUT;
 
 // PART 1
-println('1) Result of demo: ' . part1($demoinput));
-println('1) Result of real input: ' . part1($input));
+println('1) Result of demo: ' . part1($demoinput)[0]);
+println('1) Result of real input: ' . part1($input)[0]);
 println('–––');
 // PART 2
 println('2) Result of demo: ' . part2($demoinput));
