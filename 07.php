@@ -5,38 +5,6 @@ use Kirby\Toolkit\Str;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-function calculate_back(int|null $split_result, int $result, ...$nums) : int {
-	$running = is_null($split_result)
-		? $result
-		: $split_result;
-	$split_state = null;
-
-	while (count($nums) > 1) {
-		$next = array_pop($nums);
-
-		if (($running % $next === 0) && is_null($split_result)) {
-			if (is_null($split_state)) {
-				$split_state = [$running, [...$nums, $next]];
-			}
-
-			$running = (int)floor($running / $next);
-		} else {
-			$running -= $next;
-			$split_result = null;
-		}
-
-		if ($running < 0) {
-			return 0;
-		}
-	}
-	if ($running !== $nums[0]) {
-		return !is_null($split_state)
-			? calculate_back($split_state[0], $result, ...$split_state[1])
-			: 0;
-	}
-	return $result;
-}
-
 function generate_ops (int $how_many) {
 	$ops = ['*', '+'];
 	for ($i=1; $i < $how_many-1; $i++) {
@@ -103,6 +71,66 @@ function part2 (string $input) {
 	return $result;
 }
 
+function calc_recursive(bool $include_join_op, int $result, array $nums) : bool {
+	if (1 === count($nums)) {
+		return $result === $nums[0];
+	}
+	$nr = array_pop($nums);
+	if ($nr > $result) {
+		return false;
+	}
+	if ($include_join_op) {
+		$join_reversed = str_ends_with((string) $result, (string) $nr)
+			? intval(substr((string) $result, 0, -strlen((string) $nr)))
+			: null;
+	}
+
+	return calc_recursive($include_join_op, $result - $nr, $nums)
+	|| (($result % $nr === 0) && calc_recursive($include_join_op, (int)floor($result/$nr), $nums))
+	|| ($include_join_op && !is_null($join_reversed) && calc_recursive($include_join_op, $join_reversed, $nums));
+}
+
+function part1_back (string $input) {
+	$calcs = A::map(
+		Str::split($input, "\n"),
+		fn($l) => A::map(preg_split('/:? /', $l), fn($nr) => intval($nr))
+	);
+
+	$result = A::reduce(
+		$calcs,
+		function($agr, $it) {
+			$res = array_shift($it);
+			return calc_recursive(false, $res, $it)
+				? $agr+$res
+				: $agr;
+		},
+		0
+	);
+
+	return $result;
+}
+
+function part2_back (string $input) {
+	$calcs = A::map(
+		Str::split($input, "\n"),
+		fn($l) => A::map(preg_split('/:? /', $l), fn($nr) => intval($nr))
+	);
+
+	$result = A::reduce(
+		$calcs,
+		function($agr, $it) {
+			$res = array_shift($it);
+			return calc_recursive(true, $res, $it)
+				? $agr+$res
+				: $agr;
+		},
+		0
+	);
+
+	return $result;
+}
+
+
 $input = @require_once(__DIR__ . '/inputs/' . basename(__FILE__));
 $demoinput = <<<INPUT
 190: 10 19
@@ -117,15 +145,13 @@ $demoinput = <<<INPUT
 INPUT;
 
 // PART 1
-ray()->clearScreen();
-ray()->measure();
-println('1) Result of demo: ' . part1($demoinput));
-ray()->measure();
-println('1) Result of real input: ' . part1($input));
-ray()->measure();
+println('1+) Result of demo: ' . part1_back($demoinput));
+println('1+) Result of real input: ' . part1_back($input));
+// println('1) Result of demo: ' . part1($demoinput));
+// println('1) Result of real input: ' . part1($input));
 println('–––');
 // PART 2
-println('2) Result of demo: ' . part2($demoinput));
-ray()->measure();
-println('2) Result of real input: ' . part2($input));
-ray()->measure();
+println('2+) Result of demo: ' . part2_back($demoinput));
+println('2+) Result of real input: ' . part2_back($input));
+// println('2) Result of demo: ' . part2($demoinput));
+// println('2) Result of real input: ' . part2($input));
