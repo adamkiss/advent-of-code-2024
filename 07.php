@@ -67,7 +67,7 @@ function calculate(array $ops, int $result, ...$nums) {
 			$running = match($operations[$i-1]) {
 				'*' => $running * $nums[$i],
 				'+' => $running + $nums[$i],
-				'|' => intval($running . $nums[$i])
+				'|' => $running * pow(10, strlen((string)$nums[$i])) + $nums[$i]
 			};
 			if ($running > $result) {
 				continue 2;
@@ -117,9 +117,15 @@ $demoinput = <<<INPUT
 INPUT;
 
 // PART 1
+ray()->clearScreen();
+ray()->measure();
 println('1) Result of demo: ' . part1($demoinput));
+ray()->measure();
 println('1) Result of real input: ' . part1($input));
+ray()->measure();
 println('–––');
 // PART 2
 println('2) Result of demo: ' . part2($demoinput));
+ray()->measure();
 println('2) Result of real input: ' . part2($input));
+ray()->measure();
