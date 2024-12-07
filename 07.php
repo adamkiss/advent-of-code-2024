@@ -149,8 +149,16 @@ println('1+) Result of demo: ' . part1_back($demoinput));
 println('1+) Result of real input: ' . part1_back($input));
 // println('1) Result of demo: ' . part1($demoinput));
 // println('1) Result of real input: ' . part1($input));
+println('1+) Result of demo: ' . part1_back($demoinput));
+println('1+) Result of real input: ' . part1_back($input));
+// println('1) Result of demo: ' . part1($demoinput));
+// println('1) Result of real input: ' . part1($input));
 println('–––');
 // PART 2
+println('2+) Result of demo: ' . part2_back($demoinput));
+println('2+) Result of real input: ' . part2_back($input));
+// println('2) Result of demo: ' . part2($demoinput));
+// println('2) Result of real input: ' . part2($input));
 println('2+) Result of demo: ' . part2_back($demoinput));
 println('2+) Result of real input: ' . part2_back($input));
 // println('2) Result of demo: ' . part2($demoinput));
