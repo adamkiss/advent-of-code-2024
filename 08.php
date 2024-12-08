@@ -20,132 +20,104 @@ function printMap(array $map) {
 	);
 }
 
+function vec_sub(array $v1, array $v2): array {
+	return [$v1[0] - $v2[0], $v1[1] - $v2[1]];
+}
+function vec_add(array $v1, array $v2): array {
+	return [$v1[0] + $v2[0], $v1[1] + $v2[1]];
+}
+function in_bounds(array $v, int $Xmax, int $Ymax): bool {
+	return $v[0] >= 0 && $v[0] < $Xmax && $v[1] >= 0 && $v[1] < $Ymax;
+}
+
 function part1 (string $input) {
 	$map = toMap($input);
-	$pm = toMap($input);
 	$Xmax = count($map[0]);
 	$Ymax = count($map);
 	$symbols = [];
 	$antis = [];
-	foreach ($map as $y => $line) {
-		foreach ($line as $x => $symbol) {
-			if ($symbol === '.') {
+
+	for ($y=0; $y < $Ymax; $y++) {
+		$line = $map[$y];
+		for ($x=0; $x < $Xmax; $x++) {
+			if ($line[$x] === '.' || $line[$x] === '#') {
 				continue;
 			}
 
-			if (array_key_exists($symbol, $symbols)) {
-				foreach ($symbols[$symbol] as $antenna) {
-					$diff = [$x - $antenna[0], $y - $antenna[1]];
-					$anti1 = [$antenna[0] - $diff[0], $antenna[1] - $diff[1]];
-					$anti2 = [$x + $diff[0], $y + $diff[1]];
-					if (
-						$anti1[0] >= 0 && $anti1[0] < $Xmax &&
-						$anti1[1] >= 0 && $anti1[1] < $Ymax &&
-						!in_array($anti1, $antis)
-					) {
-						$antis [] = $anti1;
-
-						if ($map[$anti1[1]][$anti1[0]] === '.') {
-							$map[$anti1[1]][$anti1[0]] = '#';
-						}
-					}
-					if (
-						$anti2[0] >= 0 && $anti2[0] < $Xmax &&
-						$anti2[1] >= 0 && $anti2[1] < $Ymax &&
-						!in_array($anti2, $antis)
-					) {
-						$antis [] = $anti2;
-
-						if ($map[$anti2[1]][$anti2[0]] === '.') {
-							$map[$anti2[1]][$anti2[0]] = '#';
-						}
-					}
-				}
+			if (!isset($symbols[$line[$x]])) {
+				$symbols[$line[$x]] []= [$x, $y];
+				continue;
 			}
 
-			$symbols[$symbol] []= [$x, $y,];
+			foreach ($symbols[$line[$x]] as $antenna) {
+				$diff = [$x - $antenna[0], $y - $antenna[1]];
+
+				$back = vec_sub($antenna, $diff);
+				if (in_bounds($back, $Xmax, $Ymax)) {
+					$key = "{$back[0]},{$back[1]}";
+					isset($antis[$key]) || $antis[$key] = true;
+					$back = vec_sub($back, $diff);
+				}
+
+				$forward = vec_add([$x, $y], $diff);
+				if (in_bounds($forward, $Xmax, $Ymax)) {
+					$key = "{$forward[0]},{$forward[1]}";
+					isset($antis[$key]) || $antis[$key] = true;
+					$forward = vec_add($forward, $diff);
+				};
+			}
+
+			$symbols[$line[$x]] []= [$x, $y];
 		}
 	}
-
-	// printMap($map);
-	// rd(array_unique($antis));
 
 	return count($antis);
 }
 
 function part2 (string $input) {
 	$map = toMap($input);
-	$pm = toMap($input);
 	$Xmax = count($map[0]);
 	$Ymax = count($map);
 	$symbols = [];
 	$antis = [];
-	foreach ($map as $y => $line) {
-		foreach ($line as $x => $symbol) {
-			if ($symbol === '.' || $symbol === '#') {
+
+	for ($y=0; $y < $Ymax; $y++) {
+		$line = $map[$y];
+		for ($x=0; $x < $Xmax; $x++) {
+			if ($line[$x] === '.' || $line[$x] === '#') {
 				continue;
 			}
 
+			$symbol = $line[$x];
 			$key = "{$x},{$y}";
-			if (!isset($antis[$key])) {
-				$antis[$key] = true;
-				$pm[$y][$x] = '#';
+			isset($antis[$key]) || $antis[$key] = true;
+
+			if (!isset($symbols[$symbol])) {
+				$symbols[$symbol] []= [$x, $y];
+				continue;
 			}
 
-			if (array_key_exists($symbol, $symbols)) {
-				foreach ($symbols[$symbol] as $antenna) {
-					$diff = [$x - $antenna[0], $y - $antenna[1]];
+			foreach ($symbols[$symbol] as $antenna) {
+				$diff = [$x - $antenna[0], $y - $antenna[1]];
 
-					$back = $antenna;
-					do {
-						$back = [$back[0] - $diff[0], $back[1] - $diff[1]];
-						$key = "{$back[0]},{$back[1]}";
-						if (
-							$back[0] >= 0 && $back[0] < $Xmax &&
-							$back[1] >= 0 && $back[1] < $Ymax &&
-							!isset($antis[$key])
-						) {
-							$antis[$key] = true;
-
-							if ($map[$back[1]][$back[0]] === '.') {
-								$map[$back[1]][$back[0]] = '#';
-							}
-							$pm[$back[1]][$back[0]] = '#';
-						}
-					} while (
-						$back[0] >= 0 && $back[0] < $Xmax &&
-						$back[1] >= 0 && $back[1] < $Ymax
-					);
-
-					$forward = [$x, $y];
-					do {
-						$forward = [$forward[0] + $diff[0], $forward[1] + $diff[1]];
-						$key = "{$back[0]},{$back[1]}";
-						if (
-							$forward[0] >= 0 && $forward[0] < $Xmax &&
-							$forward[1] >= 0 && $forward[1] < $Ymax &&
-							!isset($antis[$key])
-						) {
-							$antis[$key] = true;
-
-							if ($map[$forward[1]][$forward[0]] === '.') {
-								$map[$forward[1]][$forward[0]] = '#';
-							}
-							$pm[$forward[1]][$forward[0]] = '#';
-						}
-					} while (
-						$forward[0] >= 0 && $forward[0] < $Xmax &&
-						$forward[1] >= 0 && $forward[1] < $Ymax
-					);
+				$back = vec_sub($antenna, $diff);
+				while (in_bounds($back, $Xmax, $Ymax)) {
+					$key = "{$back[0]},{$back[1]}";
+					isset($antis[$key]) || $antis[$key] = true;
+					$back = vec_sub($back, $diff);
 				}
+
+				$forward = vec_add([$x, $y], $diff);
+				while (in_bounds($forward, $Xmax, $Ymax)) {
+					$key = "{$forward[0]},{$forward[1]}";
+					isset($antis[$key]) || $antis[$key] = true;
+					$forward = vec_add($forward, $diff);
+				};
 			}
 
 			$symbols[$symbol] []= [$x, $y];
 		}
 	}
-
-	// printMap($pm);
-	// rd(array_unique($antis));
 
 	return count($antis);
 }
