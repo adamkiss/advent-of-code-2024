@@ -86,8 +86,9 @@ function part2 (string $input) {
 				continue;
 			}
 
-			if (!in_array([$x, $y], $antis)) {
-				$antis [] = [$x, $y];
+			$key = "{$x},{$y}";
+			if (!isset($antis[$key])) {
+				$antis[$key] = true;
 				$pm[$y][$x] = '#';
 			}
 
@@ -98,12 +99,13 @@ function part2 (string $input) {
 					$back = $antenna;
 					do {
 						$back = [$back[0] - $diff[0], $back[1] - $diff[1]];
+						$key = "{$back[0]},{$back[1]}";
 						if (
 							$back[0] >= 0 && $back[0] < $Xmax &&
 							$back[1] >= 0 && $back[1] < $Ymax &&
-							!in_array($back, $antis)
+							!isset($antis[$key])
 						) {
-							$antis [] = $back;
+							$antis[$key] = true;
 
 							if ($map[$back[1]][$back[0]] === '.') {
 								$map[$back[1]][$back[0]] = '#';
@@ -118,12 +120,13 @@ function part2 (string $input) {
 					$forward = [$x, $y];
 					do {
 						$forward = [$forward[0] + $diff[0], $forward[1] + $diff[1]];
+						$key = "{$back[0]},{$back[1]}";
 						if (
 							$forward[0] >= 0 && $forward[0] < $Xmax &&
 							$forward[1] >= 0 && $forward[1] < $Ymax &&
-							!in_array($forward, $antis)
+							!isset($antis[$key])
 						) {
-							$antis [] = $forward;
+							$antis[$key] = true;
 
 							if ($map[$forward[1]][$forward[0]] === '.') {
 								$map[$forward[1]][$forward[0]] = '#';
@@ -137,11 +140,11 @@ function part2 (string $input) {
 				}
 			}
 
-			$symbols[$symbol] []= [$x, $y,];
+			$symbols[$symbol] []= [$x, $y];
 		}
 	}
 
-	printMap($pm);
+	// printMap($pm);
 	// rd(array_unique($antis));
 
 	return count($antis);
