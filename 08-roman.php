@@ -1,19 +1,9 @@
 <?php
 
-class Pos {
-    public string $kind;
-    public array $coord; // Coord is now a plain array
-
-    public function __construct(string $kind, array $coord) {
-        $this->kind = $kind;
-        $this->coord = $coord;
-    }
-}
-
 function createMap(string $input): array {
     $map = [];
+
     $w = 0;
-    $h = 0;
 
     $lines = explode("\n", $input);
 
@@ -21,78 +11,48 @@ function createMap(string $input): array {
         $chars = str_split($line);
         foreach ($chars as $x => $c) {
             $kind = $c;
-            $map[] = new Pos($kind, [$x, $y]);
+            $map[] = [$kind, [$x, $y]];
         }
-
-        $w = strlen($line);
-        $h = $y;
     }
 
-    return [$map, $w, $h + 1];
+    return [
+        $map,
+        strlen($lines[0]),
+        count($lines)
+    ];
 }
 
 function indexMap(array $map): array {
     $index = [];
 
     foreach ($map as $pos) {
-        if ($pos->kind !== '.') {
-            $key = $pos->kind;
-            if (!array_key_exists($key, $index)) {
-                $index[$key] = [];
-            }
-            $index[$key][] = $pos->coord;
+        if ($pos[0] !== '.') {
+            $index[$pos[0]][] = $pos[1];
         }
     }
 
     return $index;
 }
 
-function printMap(array $map, array $nodes, int $w, int $h) {
-    $grid = array_fill(0, $h, array_fill(0, $w, '.'));
-
-    foreach ($map as $pos) {
-        $grid[$pos->coord[1]][$pos->coord[0]] = $pos->kind;
-    }
-
-    foreach (array_keys($nodes) as $coord) {
-        $coord = explode(',', $coord);
-        if ($grid[$coord[1]][$coord[0]] === '.') {
-            $grid[$coord[1]][$coord[0]] = '#';
-        }
-    }
-
-    foreach ($grid as $row) {
-        echo implode('', $row) . "\n";
-    }
-}
-
-function part1(string $input): int {
-    [$map, $w, $h] = createMap($input);
-    $index = indexMap($map);
+function part1(array $index, $w, $h): int {
     $nodes = [];
 
     foreach ($index as $positions) {
         $len = count($positions);
         for ($i = 0; $i < $len; $i++) {
             for ($j = $i + 1; $j < $len; $j++) {
-                $d = [
-                    $positions[$j][0] - $positions[$i][0],
-                    $positions[$j][1] - $positions[$i][1]
-                ];
-                $a = [
-                    $positions[$i][0] - $d[0],
-                    $positions[$i][1] - $d[1]
-                ];
-                $b = [
-                    $positions[$j][0] + $d[0],
-                    $positions[$j][1] + $d[1]
-                ];
+                $dx = $positions[$j][0] - $positions[$i][0];
+                $dy = $positions[$j][1] - $positions[$i][1];
+                $ax = $positions[$i][0] - $dx;
+                $ay = $positions[$i][1] - $dy;
+                $bx = $positions[$j][0] + $dx;
+                $by = $positions[$j][1] + $dy;
 
-                if ($a[0] >= 0 && $a[0] < $w && $a[1] >= 0 && $a[1] < $h) {
-                    $nodes["{$a[0]},{$a[1]}"] = true;
+                if ($ax >= 0 && $ax < $w && $ay >= 0 && $ay < $h) {
+                    $nodes[$ax.'.'.$ay] = true;
                 }
-                if ($b[0] >= 0 && $b[0] < $w && $b[1] >= 0 && $b[1] < $h) {
-                    $nodes["{$b[0]},{$b[1]}"] = true;
+                if ($bx >= 0 && $bx < $w && $by >= 0 && $by < $h) {
+                    $nodes[$bx.'.'.$by] = true;
                 }
             }
         }
@@ -101,33 +61,37 @@ function part1(string $input): int {
     return count($nodes);
 }
 
-function part2(string $input): int {
-    [$map, $w, $h] = createMap($input);
-    $index = indexMap($map);
+function part2(array $index, $w, $h): int {
     $nodes = [];
 
     foreach ($index as $positions) {
         $len = count($positions);
         for ($i = 0; $i < $len; $i++) {
             for ($j = $i + 1; $j < $len; $j++) {
-                $a = $positions[$i];
-                $b = $positions[$j];
+                $ax = $positions[$i][0];
+                $ay = $positions[$i][1];
 
-                $d = [$a[0] - $b[0], $a[1] - $b[1]];
+                $by = $positions[$j][1];
+                $bx = $positions[$j][0];
+
+                $dx = $ax - $bx;
+                $dy = $ay - $by;
 
                 while (true) {
-                    $a = [$a[0] - $d[0], $a[1] - $d[1]];
-                    if ($a[0] >= 0 && $a[0] < $w && $a[1] >= 0 && $a[1] < $h) {
-                        $nodes["{$a[0]},{$a[1]}"] = $a;
+                    $ax = $ax - $dx;
+                    $ay = $ay - $dy;
+                    if ($ax >= 0 && $ax < $w && $ay >= 0 && $ay < $h) {
+                        $nodes[$ax.'.'.$ay] = true;
                     } else {
                         break;
                     }
                 }
 
                 while (true) {
-                    $b = [$b[0] + $d[0], $b[1] + $d[1]];
-                    if ($b[0] >= 0 && $b[0] < $w && $b[1] >= 0 && $b[1] < $h) {
-                        $nodes["{$b[0]},{$b[1]}"] = $b;
+                    $bx = $bx + $dx;
+                    $by = $by + $dy;
+                    if ($bx >= 0 && $bx < $w && $by >= 0 && $by < $h) {
+                        $nodes[$bx.'.'.$by] = true;
                     } else {
                         break;
                     }
@@ -138,7 +102,6 @@ function part2(string $input): int {
 
     return count($nodes);
 }
-
 
 const TEST_INPUT = <<<INPUT
 ............
@@ -166,12 +129,20 @@ function assertEq($a, $b, $message) {
 
 $input = require_once('inputs/08.php');
 
-assertEq(part1(TEST_INPUT), TEST_RESULT1, 'Test 1');
-assertEq(part2(TEST_INPUT), TEST_RESULT2, 'Test 2');
+[$tmap, $tw, $th] = createMap(TEST_INPUT);
+$tindex = indexMap($tmap);
+assertEq(part1($tindex, $tw, $th), TEST_RESULT1, 'Test 1');
+assertEq(part2($tindex, $tw, $th), TEST_RESULT2, 'Test 2');
 
 $before = microtime(true);
-echo part1($input) . "\n";
-echo part2($input) . "\n";
+[$map, $w, $h] = createMap($input);
+$index = indexMap($map);
+$afterIndex = microtime(true);
+
+echo part1($index, $w, $h) . "\n";
+echo part2($index, $w, $h) . "\n";
 $after = microtime(true);
 
-echo ($after - $before) . "\n";
+printf("TOTAL: %.3fms\n", ($after - $before) * 1000);
+printf("Indexing: %.3fms\n", ($afterIndex - $before) * 1000);
+printf("Calculating: %.3fms\n", ($after - $afterIndex) * 1000);
