@@ -15,7 +15,7 @@ function createMap(string $input): array {
     $w = 0;
     $h = 0;
 
-    $lines = explode("\r\n", $input);
+    $lines = explode("\n", $input);
 
     foreach ($lines as $y => $line) {
         $chars = str_split($line);
@@ -165,6 +165,9 @@ function assertEq($a, $b, $message) {
 }
 
 $input = require_once('inputs/08.php');
+
+assertEq(part1(TEST_INPUT), TEST_RESULT1, 'Test 1');
+assertEq(part2(TEST_INPUT), TEST_RESULT2, 'Test 2');
 
 $before = microtime(true);
 echo part1($input) . "\n";
