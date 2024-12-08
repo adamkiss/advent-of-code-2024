@@ -166,9 +166,13 @@ $demoinput = <<<INPUT
 INPUT;
 
 // PART 1
-println('1) Result of demo: ' . part1($demoinput));
-println('1) Result of real input: ' . part1($input));
-println('–––');
+// println('1) Result of demo: ' . part1($demoinput));
+// println('1) Result of real input: ' . part1($input));
+// println('–––');
 // PART 2
-println('2) Result of demo: ' . part2($demoinput));
-println('2) Result of real input: ' . part2($input));
+// println('2) Result of demo: ' . part2($demoinput));
+// println('2) Result of real input: ' . part2($input));
+$s = microtime(true);
+echo part1($input) . "\n";
+echo part2($input) . "\n";
+println(microtime(true) - $s);
