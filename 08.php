@@ -147,4 +147,4 @@ INPUT;
 $s = microtime(true);
 echo part1($input) . "\n";
 echo part2($input) . "\n";
-println(microtime(true) - $s);
+printf("TOTAL: %.3fms\n", (microtime(true) - $s) * 1000);

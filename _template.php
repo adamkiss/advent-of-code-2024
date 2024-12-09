@@ -15,6 +15,7 @@ $demoinput = <<<INPUT
 PASTEDEMOINPUTHERE
 INPUT;
 
+$s = microtime(true);
 // PART 1
 println('1) Result of demo: ' . part1($demoinput));
 println('1) Result of real input: ' . part1($input));
@@ -22,3 +23,4 @@ println('–––');
 // PART 2
 println('2) Result of demo: ' . part2($demoinput));
 println('2) Result of real input: ' . part2($input));
+printf("TOTAL: %.3fms\n", ($s - microtime(true)) * 1000);
