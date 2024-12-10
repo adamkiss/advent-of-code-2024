@@ -21,6 +21,14 @@ $demoinput2 = <<<INPUT
 01329801
 10456732
 INPUT;
+$demoinput3 = <<<INPUT
+012345
+123456
+234567
+345678
+4.6789
+56789.
+INPUT;
 
 function toMap(string $input): array {
 	$map = array_map(
@@ -52,7 +60,6 @@ function in_bounds2(int $x, int $y, int $Xmax, int $Ymax): bool {
 }
 
 function part1 (string $input) {
-	$lines = explode("\n", $input);
 	$map = toMap($input);
 	$maxX = count($map[0]);
 	$maxY = count($map);
@@ -92,31 +99,71 @@ function p1next(array $map, int $cur, int $x, int $y, int $mx, int $my, int $sx,
 }
 
 function part2 (string $input) {
-	return true;
+	$map = toMap($input);
+	$maxX = count($map[0]);
+	$maxY = count($map);
+
+	$paths = 0;
+	foreach ($map as $i => $line) {
+		foreach ($line as $j => $point) {
+			if ($point === 0) {
+				$paths += p2next($map, $point,  $j, $i, $maxX, $maxY);
+			}
+		}
+	}
+
+	return $paths;
 }
+
+function p2next(array $map, int $cur, int $x, int $y, int $mx, int $my) : int {
+	if ($cur === 9) {
+		return 1;
+	}
+
+	$found = 0;
+	$next = $cur + 1;
+
+	foreach ([[-1, 0], [1, 0], [0, -1], [0, 1]] as [$xplus, $yplus]) {
+		[$xn, $yn] = vec_add($x, $y, $xplus, $yplus);
+		if (!in_bounds2($xn, $yn, $mx, $my)) {
+			continue;
+		}
+		if ($map[$yn][$xn] !== $next) {
+			continue;
+		}
+		$found += p2next($map, $next, $xn, $yn, $mx, $my);
+	}
+
+	return $found;
+}
+
 
 $s = microtime(true);
 
 // 1
 $p = microtime(true);
-println('1) Result of demo: ' . part1($demoinput1));
+println('1) Result of demo1: ' . part1($demoinput1));
 printf("» %.3fms\n", (microtime(true)-$p) * 1000);
 
 $p = microtime(true);
-println('1) Result of demo: ' . part1($demoinput2));
+println('1) Result of demo2: ' . part1($demoinput2));
 printf("» %.3fms\n", (microtime(true)-$p) * 1000);
-//
+
 $p = microtime(true);
 println('1) Result of real input: ' . part1($input));
 printf("» %.3fms\n", (microtime(true)-$p) * 1000);
 
 // 2
-// $p = microtime(true);
-// println('2) Result of demo: ' . part2($demoinput));
-// printf("» %.3fms\n", (microtime(true)-$p) * 1000);
-//
-// $p = microtime(true);
-// println('2) Result of real input: ' . part2($input));
-// printf("» %.3fms\n", (microtime(true)-$p) * 1000);
+$p = microtime(true);
+println('2) Result of demo3 (227): ' . part2($demoinput3));
+printf("» %.3fms\n", (microtime(true)-$p) * 1000);
+
+$p = microtime(true);
+println('2) Result of demo2 (81): ' . part2($demoinput2));
+printf("» %.3fms\n", (microtime(true)-$p) * 1000);
+
+$p = microtime(true);
+println('2) Result of real input: ' . part2($input));
+printf("» %.3fms\n", (microtime(true)-$p) * 1000);
 
 printf("TOTAL: %.3fms\n", (microtime(true)-$s) * 1000);
