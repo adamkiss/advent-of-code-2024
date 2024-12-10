@@ -1,8 +1,6 @@
 <?php
 
 function println(...$strings): void {
-	foreach ($strings as $s) {
-		print $s;
-	}
+	print join(', ', $strings);
 	print "\n";
 }
