@@ -59,7 +59,7 @@ function in_bounds2(int $x, int $y, int $Xmax, int $Ymax): bool {
 	return $x >= 0 && $x < $Xmax && $y >= 0 && $y < $Ymax;
 }
 
-function part1 (string $input) {
+function walk (string $input) {
 	$map = toMap($input);
 	$maxX = count($map[0]);
 	$maxY = count($map);
@@ -68,15 +68,15 @@ function part1 (string $input) {
 	foreach ($map as $i => $line) {
 		foreach ($line as $j => $point) {
 			if ($point === 0) {
-				$paths []= p1next($map, $point,  $j, $i, $maxX, $maxY, $j, $i);
+				$paths []= step($map, $point,  $j, $i, $maxX, $maxY, $j, $i);
 			}
 		}
 	}
 
-	return count(array_unique(array_merge(...$paths)));
+	return array_merge(...$paths);
 }
 
-function p1next(array $map, int $cur, int $x, int $y, int $mx, int $my, int $sx, int $sy) : array {
+function step(array $map, int $cur, int $x, int $y, int $mx, int $my, int $sx, int $sy) : array {
 	if ($cur === 9) {
 		return ["$sx,$sy,$x,$y"];
 	}
@@ -92,49 +92,18 @@ function p1next(array $map, int $cur, int $x, int $y, int $mx, int $my, int $sx,
 		if ($map[$yn][$xn] !== $next) {
 			continue;
 		}
-		$found = array_merge($found, p1next($map, $next, $xn, $yn, $mx, $my, $sx, $sy));
+		$found = array_merge($found, step($map, $next, $xn, $yn, $mx, $my, $sx, $sy));
 	}
 
 	return $found;
 }
 
-function part2 (string $input) {
-	$map = toMap($input);
-	$maxX = count($map[0]);
-	$maxY = count($map);
-
-	$paths = 0;
-	foreach ($map as $i => $line) {
-		foreach ($line as $j => $point) {
-			if ($point === 0) {
-				$paths += p2next($map, $point,  $j, $i, $maxX, $maxY);
-			}
-		}
-	}
-
-	return $paths;
+function part1 (string $input): int {
+	return count(array_unique(walk($input)));
 }
 
-function p2next(array $map, int $cur, int $x, int $y, int $mx, int $my) : int {
-	if ($cur === 9) {
-		return 1;
-	}
-
-	$found = 0;
-	$next = $cur + 1;
-
-	foreach ([[-1, 0], [1, 0], [0, -1], [0, 1]] as [$xplus, $yplus]) {
-		[$xn, $yn] = vec_add($x, $y, $xplus, $yplus);
-		if (!in_bounds2($xn, $yn, $mx, $my)) {
-			continue;
-		}
-		if ($map[$yn][$xn] !== $next) {
-			continue;
-		}
-		$found += p2next($map, $next, $xn, $yn, $mx, $my);
-	}
-
-	return $found;
+function part2 (string $input): int {
+	return count(walk($input));
 }
 
 
@@ -153,6 +122,8 @@ $p = microtime(true);
 println('1) Result of real input: ' . part1($input));
 printf("» %.3fms\n", (microtime(true)-$p) * 1000);
 
+println();
+
 // 2
 $p = microtime(true);
 println('2) Result of demo3 (227): ' . part2($demoinput3));
@@ -166,4 +137,5 @@ $p = microtime(true);
 println('2) Result of real input: ' . part2($input));
 printf("» %.3fms\n", (microtime(true)-$p) * 1000);
 
+println();
 printf("TOTAL: %.3fms\n", (microtime(true)-$s) * 1000);
